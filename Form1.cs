@@ -55,6 +55,10 @@ namespace PetSimulator
         private PetStage petStage = PetStage.Baby;
         private int idleCounter = 0;
 
+        // YENÄ°: Ses ayarÄ±
+        private bool soundEnabled = false;
+        private ToolStripMenuItem soundMenuItem;
+
         // Top Oyunu
         private bool ballActive = false;
         private Point ballPosition;
@@ -64,7 +68,7 @@ namespace PetSimulator
         private Color ballColor = Color.Red;
         private int ballBounceCount = 0;
 
-        // Baþarýmlar
+        // BaÅŸarÄ±mlar
         private Dictionary<string, bool> achievements = new Dictionary<string, bool>();
         private int totalFeeds = 0;
         private int totalPlays = 0;
@@ -168,7 +172,7 @@ namespace PetSimulator
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            // Form yüklendiðinde çalýþacak kodlar (þu an boþ)
+            // Form yÃ¼klendiÄŸinde Ã§alÄ±ÅŸacak kodlar (ÅŸu an boÅŸ)
         }
 
         private void InitializeAchievements()
@@ -189,9 +193,9 @@ namespace PetSimulator
 
         private void InitializeAccessories()
         {
-            ownedAccessories.Add(new Accessory { Name = "Þapka", Icon = "??", Type = AccessoryType.Hat });
-            ownedAccessories.Add(new Accessory { Name = "Papyon", Icon = "??", Type = AccessoryType.Bowtie });
-            ownedAccessories.Add(new Accessory { Name = "Gözlük", Icon = "??", Type = AccessoryType.Glasses });
+            ownedAccessories.Add(new Accessory { Name = "Åžapka", Icon = "^", Type = AccessoryType.Hat });
+            ownedAccessories.Add(new Accessory { Name = "Papyon", Icon = "<>", Type = AccessoryType.Bowtie });
+            ownedAccessories.Add(new Accessory { Name = "GÃ¶zlÃ¼k", Icon = "O-O", Type = AccessoryType.Glasses });
         }
 
         private void InitializeWeather()
@@ -210,12 +214,12 @@ namespace PetSimulator
                 Array values = Enum.GetValues(typeof(WeatherType));
                 currentWeather = (WeatherType)values.GetValue(random.Next(values.Length));
 
-                string weatherMsg = currentWeather == WeatherType.Rainy ? "Yaðmur yaðýyor! ?" :
-                                   currentWeather == WeatherType.Snowy ? "Kar yaðýyor! ??" :
-                                   currentWeather == WeatherType.Cloudy ? "Hava bulutlu ??" :
-                                   "Hava güneþli! ??";
+                string weatherMsg = currentWeather == WeatherType.Rainy ? "YaÄŸmur yaÄŸÄ±yor!" :
+                                   currentWeather == WeatherType.Snowy ? "Kar yaÄŸÄ±yor!" :
+                                   currentWeather == WeatherType.Cloudy ? "Hava bulutlu" :
+                                   "Hava gÃ¼neÅŸli!";
 
-                trayIcon.ShowBalloonTip(2000, "Hava Deðiþti!", weatherMsg, ToolTipIcon.Info);
+                trayIcon.ShowBalloonTip(2000, "Hava DeÄŸiÅŸti!", weatherMsg, ToolTipIcon.Info);
                 weatherParticles.Clear();
             }
         }
@@ -499,13 +503,13 @@ namespace PetSimulator
             if (age >= 140 && !achievements["week_old"])
             {
                 achievements["week_old"] = true;
-                ShowAchievementUnlocked("1 Haftalýk", "Pet'in 1 hafta yaþadý! ??");
+                ShowAchievementUnlocked("1 HaftalÄ±k", "Pet'in 1 hafta yaÅŸadÄ±!");
             }
 
             if (happiness >= 80 && !achievements["happy_pet"])
             {
                 achievements["happy_pet"] = true;
-                ShowAchievementUnlocked("Çok Mutlu Pet", "Pet'in çok mutlu! ??");
+                ShowAchievementUnlocked("Ã‡ok Mutlu Pet", "Pet'in Ã§ok mutlu!");
             }
 
             UpdateTrayMenu();
@@ -514,16 +518,16 @@ namespace PetSimulator
 
             if (hunger < 20 && hunger % 6 == 0)
             {
-                trayIcon.ShowBalloonTip(2000, $"{petName} acýktý! ??", "Pet'iniz çok aç, yem verin!", ToolTipIcon.Warning);
+                trayIcon.ShowBalloonTip(2000, $"{petName} acÄ±ktÄ±!", "Pet'iniz Ã§ok aÃ§, yem verin!", ToolTipIcon.Warning);
                 PlaySound("meow");
             }
             if (happiness < 20 && happiness % 6 == 0)
             {
-                trayIcon.ShowBalloonTip(2000, $"{petName} sýkýldý! ??", "Pet'iniz mutsuz, onunla oynayýn!", ToolTipIcon.Warning);
+                trayIcon.ShowBalloonTip(2000, $"{petName} sÄ±kÄ±ldÄ±!", "Pet'iniz mutsuz, onunla oynayÄ±n!", ToolTipIcon.Warning);
             }
             if (energy < 20 && energy % 6 == 0)
             {
-                trayIcon.ShowBalloonTip(2000, $"{petName} yorgun! ??", "Pet'iniz çok yorgun, dinlenmeli!", ToolTipIcon.Info);
+                trayIcon.ShowBalloonTip(2000, $"{petName} yorgun!", "Pet'iniz Ã§ok yorgun, dinlenmeli!", ToolTipIcon.Info);
             }
         }
 
@@ -540,9 +544,9 @@ namespace PetSimulator
 
             if (oldStage != petStage)
             {
-                string stageText = petStage == PetStage.Young ? "genç" : "yetiþkin";
-                trayIcon.ShowBalloonTip(3000, $"{petName} büyüdü! ??",
-                    $"{petName} artýk {stageText} bir kedi!", ToolTipIcon.Info);
+                string stageText = petStage == PetStage.Young ? "genÃ§" : "yetiÅŸkin";
+                trayIcon.ShowBalloonTip(3000, $"{petName} bÃ¼yÃ¼dÃ¼!",
+                    $"{petName} artÄ±k {stageText} bir kedi!", ToolTipIcon.Info);
                 PlaySound("meow");
             }
         }
@@ -551,19 +555,19 @@ namespace PetSimulator
         {
             int days = age / 20;
             string stage = petStage == PetStage.Baby ? "Bebek" :
-                          petStage == PetStage.Young ? "Genç" : "Yetiþkin";
-            return $"{days} gün ({stage})";
+                          petStage == PetStage.Young ? "GenÃ§" : "YetiÅŸkin";
+            return $"{days} gÃ¼n ({stage})";
         }
 
         private void UpdateTrayIconStatus()
         {
-            string status = "Saðlýklý";
+            string status = "SaÄŸlÄ±klÄ±";
             if (hunger < 30 || happiness < 30 || energy < 30)
-                status = "Bakým Gerekli";
+                status = "BakÄ±m Gerekli";
             if (hunger < 10 || happiness < 10)
                 status = "Acil!";
 
-            trayIcon.Text = $"{petName} - {status}\nAçlýk:{hunger}% Mutluluk:{happiness}% Enerji:{energy}%";
+            trayIcon.Text = $"{petName} - {status}\nAÃ§lÄ±k:{hunger}% Mutluluk:{happiness}% Enerji:{energy}%";
         }
 
         private void Form1_Paint(object sender, PaintEventArgs e)
@@ -609,11 +613,11 @@ namespace PetSimulator
                 }
             }
 
-            string weatherIcon = currentWeather == WeatherType.Sunny ? "??" :
-                                currentWeather == WeatherType.Rainy ? "???" :
-                                currentWeather == WeatherType.Snowy ? "??" : "??";
+            string weatherIcon = currentWeather == WeatherType.Sunny ? "SUN" :
+                                currentWeather == WeatherType.Rainy ? "RAIN" :
+                                currentWeather == WeatherType.Snowy ? "SNOW" : "CLOUD";
 
-            using (Font font = new Font("Arial", 10))
+            using (Font font = new Font("Arial", 8, FontStyle.Bold))
             using (SolidBrush brush = new SolidBrush(Color.White))
             {
                 g.DrawString(weatherIcon, font, brush, 2, 2);
@@ -897,10 +901,10 @@ namespace PetSimulator
 
             if (happiness > 80 && animationFrame % 30 < 15)
             {
-                using (Font font = new Font("Arial", 12, FontStyle.Bold))
+                using (Font font = new Font("Arial", 10, FontStyle.Bold))
                 using (SolidBrush brush = new SolidBrush(Color.FromArgb(255, 20, 147)))
                 {
-                    g.DrawString("?", font, brush, 50, 0);
+                    g.DrawString("<3", font, brush, 50, 0);
                 }
             }
         }
@@ -1050,6 +1054,8 @@ namespace PetSimulator
 
         private void PlaySound(string soundType)
         {
+            if (!soundEnabled) return; // Ses kapalÄ±ysa Ã§Ä±k
+
             try
             {
                 if (soundType == "meow")
@@ -1151,7 +1157,7 @@ namespace PetSimulator
             if (!achievements["first_feed"])
             {
                 achievements["first_feed"] = true;
-                ShowAchievementUnlocked("Ýlk Besleme", "Pet'ini ilk kez besledin! ??");
+                ShowAchievementUnlocked("Ä°lk Besleme", "Pet'ini ilk kez besledin!");
             }
 
             System.Threading.Tasks.Task.Delay(2000).ContinueWith(t =>
@@ -1162,8 +1168,8 @@ namespace PetSimulator
                     currentState = PetState.Idle;
             });
 
-            trayIcon.ShowBalloonTip(2000, "Afiyet olsun! ??",
-                $"{petName} doydu! Açlýk: {hunger}%",
+            trayIcon.ShowBalloonTip(2000, "Afiyet olsun!",
+                $"{petName} doydu! AÃ§lÄ±k: {hunger}%",
                 ToolTipIcon.Info);
             UpdateTrayMenu();
             this.Invalidate();
@@ -1180,7 +1186,7 @@ namespace PetSimulator
             if (!achievements["first_play"])
             {
                 achievements["first_play"] = true;
-                ShowAchievementUnlocked("Ýlk Oyun", "Pet'inle ilk kez oynadýn! ??");
+                ShowAchievementUnlocked("Ä°lk Oyun", "Pet'inle ilk kez oynadÄ±n!");
             }
 
             System.Threading.Tasks.Task.Delay(3000).ContinueWith(t =>
@@ -1191,8 +1197,8 @@ namespace PetSimulator
                     currentState = PetState.Idle;
             });
 
-            trayIcon.ShowBalloonTip(2000, "Yaþasýn! ??",
-                $"{petName} çok mutlu! Mutluluk: {happiness}%",
+            trayIcon.ShowBalloonTip(2000, "YaÅŸasÄ±n!",
+                $"{petName} Ã§ok mutlu! Mutluluk: {happiness}%",
                 ToolTipIcon.Info);
             UpdateTrayMenu();
             this.Invalidate();
@@ -1204,7 +1210,7 @@ namespace PetSimulator
             velocityX = 0;
             velocityY = 0;
             sleepCounter = 0;
-            trayIcon.ShowBalloonTip(2000, "Ýyi uykular! ??",
+            trayIcon.ShowBalloonTip(2000, "Ä°yi uykular!",
                 $"{petName} dinleniyor...",
                 ToolTipIcon.Info);
             this.Invalidate();
@@ -1212,41 +1218,41 @@ namespace PetSimulator
 
         private void ShowStatsMessage()
         {
-            string condition = "Mükemmel";
+            string condition = "MÃ¼kemmel";
             if (hunger < 50 || happiness < 50 || energy < 50)
-                condition = "Ýyi";
+                condition = "Ä°yi";
             if (hunger < 30 || happiness < 30 || energy < 30)
                 condition = "Orta";
             if (hunger < 20 || happiness < 20 || energy < 20)
-                condition = "Kötü";
+                condition = "KÃ¶tÃ¼";
 
             TimeSpan timeLived = DateTime.Now - birthDate;
             int completed = achievements.Values.Count(x => x);
             string accessoryText = currentAccessory != null ? currentAccessory.Name : "Yok";
-            string weatherText = currentWeather == WeatherType.Sunny ? "Güneþli ??" :
-                                currentWeather == WeatherType.Rainy ? "Yaðmurlu ???" :
-                                currentWeather == WeatherType.Snowy ? "Karlý ??" : "Bulutlu ??";
+            string weatherText = currentWeather == WeatherType.Sunny ? "GÃ¼neÅŸli" :
+                                currentWeather == WeatherType.Rainy ? "YaÄŸmurlu" :
+                                currentWeather == WeatherType.Snowy ? "KarlÄ±" : "Bulutlu";
 
             MessageBox.Show(
-                $"?? {petName} - Pet Ýstatistikleri\n\n" +
-                $"Açlýk: {hunger}%\n" +
+                $">> {petName} - Pet Ä°statistikleri\n\n" +
+                $"AÃ§lÄ±k: {hunger}%\n" +
                 $"Mutluluk: {happiness}%\n" +
                 $"Enerji: {energy}%\n" +
-                $"Yaþ: {GetAgeString()}\n" +
-                $"Yaþam Süresi: {timeLived.Days} gün {timeLived.Hours} saat\n" +
+                $"YaÅŸ: {GetAgeString()}\n" +
+                $"YaÅŸam SÃ¼resi: {timeLived.Days} gÃ¼n {timeLived.Hours} saat\n" +
                 $"Aksesuar: {accessoryText}\n" +
                 $"Hava Durumu: {weatherText}\n\n" +
-                $"?? Ýstatistikler:\n" +
+                $">> Ä°statistikler:\n" +
                 $"Toplam Besleme: {totalFeeds}\n" +
                 $"Toplam Oyun: {totalPlays}\n" +
                 $"Yakalanan Top: {ballsCaught}\n" +
-                $"Baþarýmlar: {completed}/6\n\n" +
+                $"BaÅŸarÄ±mlar: {completed}/6\n\n" +
                 $"Durum: {condition}\n\n" +
-                $"?? Tuþ Kontrolleri:\n" +
-                $"I = Bakým Menüsü\n" +
-                $"B = Top Fýrlat\n" +
+                $">> TuÅŸ Kontrolleri:\n" +
+                $"I = BakÄ±m MenÃ¼sÃ¼\n" +
+                $"B = Top FÄ±rlat\n" +
                 $"S = Otur | P = Pati Ver | T = Takla At\n" +
-                $"A = Aksesuar | H = Baþarýmlar",
+                $"A = Aksesuar | H = BaÅŸarÄ±mlar",
                 "Pet Simulator",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
@@ -1254,11 +1260,17 @@ namespace PetSimulator
 
         private void UpdateTrayMenu()
         {
-            trayMenu.Items[0].Text = $"?? {petName}";
-            trayMenu.Items[6].Text = $"Açlýk: {hunger}%";
+            trayMenu.Items[0].Text = $">> {petName}";
+            trayMenu.Items[6].Text = $"AÃ§lÄ±k: {hunger}%";
             trayMenu.Items[7].Text = $"Mutluluk: {happiness}%";
             trayMenu.Items[8].Text = $"Enerji: {energy}%";
-            trayMenu.Items[9].Text = $"Yaþ: {GetAgeString()}";
+            trayMenu.Items[9].Text = $"YaÅŸ: {GetAgeString()}";
+
+            // Ses menÃ¼sÃ¼ gÃ¼ncelle
+            if (soundMenuItem != null)
+            {
+                soundMenuItem.Text = soundEnabled ? "ðŸ”Š Sesler: AÃ§Ä±k" : "ðŸ”‡ Sesler: KapalÄ±";
+            }
         }
 
         private void SavePetData()
@@ -1282,6 +1294,7 @@ namespace PetSimulator
                     writer.WriteLine(ballsCaught);
                     writer.WriteLine(string.Join(",", achievements.Select(x => x.Key + ":" + x.Value)));
                     writer.WriteLine(currentAccessory?.Name ?? "");
+                    writer.WriteLine(soundEnabled); // Ses ayarÄ±nÄ± kaydet
                 }
             }
             catch { }
@@ -1326,6 +1339,13 @@ namespace PetSimulator
                         {
                             currentAccessory = ownedAccessories.FirstOrDefault(x => x.Name == accName);
                         }
+
+                        // Ses ayarÄ±nÄ± yÃ¼kle
+                        string soundLine = reader.ReadLine();
+                        if (!string.IsNullOrEmpty(soundLine))
+                        {
+                            soundEnabled = bool.Parse(soundLine);
+                        }
                     }
                 }
                 else
@@ -1337,6 +1357,7 @@ namespace PetSimulator
             {
                 birthDate = DateTime.Now;
                 petName = "Kedi";
+                soundEnabled = false;
             }
         }
 
@@ -1344,7 +1365,7 @@ namespace PetSimulator
         {
             using (Form nameForm = new Form())
             {
-                nameForm.Text = "Pet'ine Ýsim Ver! ??";
+                nameForm.Text = "Pet'ine Ä°sim Ver!";
                 nameForm.Size = new Size(350, 180);
                 nameForm.StartPosition = FormStartPosition.CenterScreen;
                 nameForm.FormBorderStyle = FormBorderStyle.FixedDialog;
@@ -1361,10 +1382,10 @@ namespace PetSimulator
                 textBox.Location = new Point(20, 50);
                 textBox.Size = new Size(290, 25);
                 textBox.Font = new Font("Arial", 11);
-                textBox.Text = "Minnoþ";
+                textBox.Text = "MinnoÅŸ";
 
                 Button okButton = new Button();
-                okButton.Text = "Tamam! ??";
+                okButton.Text = "Tamam!";
                 okButton.Location = new Point(110, 90);
                 okButton.Size = new Size(120, 35);
                 okButton.Font = new Font("Arial", 10, FontStyle.Bold);
@@ -1378,8 +1399,8 @@ namespace PetSimulator
                         nameForm.DialogResult = DialogResult.OK;
                         nameForm.Close();
                         PlaySound("meow");
-                        trayIcon.ShowBalloonTip(3000, $"Merhaba {petName}! ??",
-                            "Pet'in artýk hazýr! Tuþ kontrolleri:\nI=Menü B=Top S=Otur P=Pati T=Takla A=Aksesuar H=Baþarýmlar",
+                        trayIcon.ShowBalloonTip(3000, $"Merhaba {petName}!",
+                            "Pet'in artÄ±k hazÄ±r! TuÅŸ kontrolleri:\nI=MenÃ¼ B=Top S=Otur P=Pati T=Takla A=Aksesuar H=BaÅŸarÄ±mlar",
                             ToolTipIcon.Info);
                     }
                 };
@@ -1397,7 +1418,7 @@ namespace PetSimulator
         {
             using (Form menuForm = new Form())
             {
-                menuForm.Text = $"{petName} - Bakým Menüsü";
+                menuForm.Text = $"{petName} - BakÄ±m MenÃ¼sÃ¼";
                 menuForm.Size = new Size(350, 280);
                 menuForm.StartPosition = FormStartPosition.CenterScreen;
                 menuForm.FormBorderStyle = FormBorderStyle.FixedDialog;
@@ -1406,21 +1427,21 @@ namespace PetSimulator
                 menuForm.BackColor = Color.FromArgb(255, 250, 240);
 
                 Label titleLabel = new Label();
-                titleLabel.Text = $"?? {petName} ile ilgilen";
+                titleLabel.Text = $">> {petName} ile ilgilen";
                 titleLabel.Font = new Font("Arial", 12, FontStyle.Bold);
                 titleLabel.Location = new Point(20, 15);
                 titleLabel.Size = new Size(300, 25);
                 titleLabel.TextAlign = ContentAlignment.MiddleCenter;
 
                 Label statsLabel = new Label();
-                statsLabel.Text = $"Açlýk: {hunger}%  |  Mutluluk: {happiness}%  |  Enerji: {energy}%";
+                statsLabel.Text = $"AÃ§lÄ±k: {hunger}%  |  Mutluluk: {happiness}%  |  Enerji: {energy}%";
                 statsLabel.Font = new Font("Arial", 9);
                 statsLabel.Location = new Point(20, 45);
                 statsLabel.Size = new Size(300, 20);
                 statsLabel.TextAlign = ContentAlignment.MiddleCenter;
 
                 Button feedButton = new Button();
-                feedButton.Text = "?? Yem Ver (+35 Açlýk)";
+                feedButton.Text = "Yem Ver (+35 AÃ§lÄ±k)";
                 feedButton.Font = new Font("Arial", 10, FontStyle.Bold);
                 feedButton.Location = new Point(40, 80);
                 feedButton.Size = new Size(260, 40);
@@ -1429,7 +1450,7 @@ namespace PetSimulator
                 feedButton.Click += (s, ev) => { FeedPet(s, ev); menuForm.Close(); };
 
                 Button playButton = new Button();
-                playButton.Text = "?? Oyna (+30 Mutluluk)";
+                playButton.Text = "Oyna (+30 Mutluluk)";
                 playButton.Font = new Font("Arial", 10, FontStyle.Bold);
                 playButton.Location = new Point(40, 130);
                 playButton.Size = new Size(260, 40);
@@ -1438,7 +1459,7 @@ namespace PetSimulator
                 playButton.Click += (s, ev) => { PlayWithPet(s, ev); menuForm.Close(); };
 
                 Button sleepButton = new Button();
-                sleepButton.Text = "?? Uyu (+Enerji)";
+                sleepButton.Text = "Uyu (+Enerji)";
                 sleepButton.Font = new Font("Arial", 10, FontStyle.Bold);
                 sleepButton.Location = new Point(40, 180);
                 sleepButton.Size = new Size(260, 40);
@@ -1469,7 +1490,7 @@ namespace PetSimulator
                 accForm.BackColor = Color.FromArgb(255, 250, 240);
 
                 Label titleLabel = new Label();
-                titleLabel.Text = "?? Aksesuar Seç";
+                titleLabel.Text = ">> Aksesuar SeÃ§";
                 titleLabel.Font = new Font("Arial", 12, FontStyle.Bold);
                 titleLabel.Location = new Point(20, 15);
                 titleLabel.Size = new Size(300, 25);
@@ -1478,7 +1499,7 @@ namespace PetSimulator
 
                 int yPos = 60;
                 Button noneButton = new Button();
-                noneButton.Text = "? Hiçbiri";
+                noneButton.Text = "HiÃ§biri";
                 noneButton.Font = new Font("Arial", 10);
                 noneButton.Location = new Point(40, yPos);
                 noneButton.Size = new Size(260, 40);
@@ -1499,8 +1520,8 @@ namespace PetSimulator
                     btn.Click += (s, ev) =>
                     {
                         currentAccessory = (Accessory)((Button)s).Tag;
-                        trayIcon.ShowBalloonTip(1500, "Aksesuar Takýldý! ??",
-                            $"{petName} artýk {currentAccessory.Name} takýyor!", ToolTipIcon.Info);
+                        trayIcon.ShowBalloonTip(1500, "Aksesuar TakÄ±ldÄ±!",
+                            $"{petName} artÄ±k {currentAccessory.Name} takÄ±yor!", ToolTipIcon.Info);
                         accForm.Close();
                     };
                     accForm.Controls.Add(btn);
@@ -1513,30 +1534,30 @@ namespace PetSimulator
 
         private void ShowAchievements()
         {
-            string achText = "?? BAÞARIMLAR\n\n";
+            string achText = ">> BAÅžARIMLAR\n\n";
 
-            achText += achievements["first_feed"] ? "?" : "?";
-            achText += " Ýlk Besleme\n";
+            achText += achievements["first_feed"] ? "[X]" : "[ ]";
+            achText += " Ä°lk Besleme\n";
 
-            achText += achievements["first_play"] ? "?" : "?";
-            achText += " Ýlk Oyun\n";
+            achText += achievements["first_play"] ? "[X]" : "[ ]";
+            achText += " Ä°lk Oyun\n";
 
-            achText += achievements["ball_master"] ? "?" : "?";
-            achText += $" Top Ustasý (10/10) - Yakalanan: {ballsCaught}\n";
+            achText += achievements["ball_master"] ? "[X]" : "[ ]";
+            achText += $" Top UstasÄ± (10/10) - Yakalanan: {ballsCaught}\n";
 
-            achText += achievements["week_old"] ? "?" : "?";
-            achText += " 1 Haftalýk\n";
+            achText += achievements["week_old"] ? "[X]" : "[ ]";
+            achText += " 1 HaftalÄ±k\n";
 
-            achText += achievements["happy_pet"] ? "?" : "?";
-            achText += " Çok Mutlu Pet\n";
+            achText += achievements["happy_pet"] ? "[X]" : "[ ]";
+            achText += " Ã‡ok Mutlu Pet\n";
 
-            achText += achievements["trick_master"] ? "?" : "?";
-            achText += " Numara Ustasý\n";
+            achText += achievements["trick_master"] ? "[X]" : "[ ]";
+            achText += " Numara UstasÄ±\n";
 
             int completed = achievements.Values.Count(x => x);
-            achText += $"\n?? Tamamlanan: {completed}/6";
+            achText += $"\n>> Tamamlanan: {completed}/6";
 
-            MessageBox.Show(achText, $"{petName} - Baþarýmlar", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show(achText, $"{petName} - BaÅŸarÄ±mlar", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void CheckAchievement(string achName)
@@ -1546,14 +1567,14 @@ namespace PetSimulator
                 if (achName == "ball_master" && ballsCaught >= 10)
                 {
                     achievements[achName] = true;
-                    ShowAchievementUnlocked("Top Ustasý", "10 top yakaladýn! ??");
+                    ShowAchievementUnlocked("Top UstasÄ±", "10 top yakaladÄ±n!");
                 }
             }
         }
 
         private void ShowAchievementUnlocked(string name, string desc)
         {
-            trayIcon.ShowBalloonTip(3000, $"?? Baþarým Kazanýldý: {name}", desc, ToolTipIcon.Info);
+            trayIcon.ShowBalloonTip(3000, $">> BaÅŸarÄ±m KazanÄ±ldÄ±: {name}", desc, ToolTipIcon.Info);
             PlaySound("meow");
         }
 
@@ -1696,7 +1717,7 @@ namespace PetSimulator
                 ballsCaught++;
                 CheckAchievement("ball_master");
                 PlaySound("purr");
-                trayIcon.ShowBalloonTip(1500, "Yakaladý! ??", $"{petName} topu yakaladý! Top: {ballsCaught}", ToolTipIcon.Info);
+                trayIcon.ShowBalloonTip(1500, "YakaladÄ±!", $"{petName} topu yakaladÄ±! Top: {ballsCaught}", ToolTipIcon.Info);
 
                 System.Threading.Tasks.Task.Delay(1500).ContinueWith(t =>
                 {
@@ -1722,7 +1743,7 @@ namespace PetSimulator
             currentState = PetState.ChasingBall;
             ballTimer.Start();
             PlaySound("meow");
-            trayIcon.ShowBalloonTip(1000, "Top Zamaný! ??", $"{petName} topu kovalýyor!", ToolTipIcon.Info);
+            trayIcon.ShowBalloonTip(1000, "Top ZamanÄ±!", $"{petName} topu kovalÄ±yor!", ToolTipIcon.Info);
         }
 
         private void PerformTrick(PetTrick trick)
@@ -1735,14 +1756,14 @@ namespace PetSimulator
             happiness = Math.Min(100, happiness + 10);
             energy = Math.Max(0, energy - 5);
 
-            string trickName = trick == PetTrick.Sit ? "oturdu" : trick == PetTrick.Paw ? "pati verdi" : "takla attý";
-            trayIcon.ShowBalloonTip(1500, $"Aferin {petName}! ??", $"{petName} {trickName}!", ToolTipIcon.Info);
+            string trickName = trick == PetTrick.Sit ? "oturdu" : trick == PetTrick.Paw ? "pati verdi" : "takla attÄ±";
+            trayIcon.ShowBalloonTip(1500, $"Aferin {petName}!", $"{petName} {trickName}!", ToolTipIcon.Info);
             PlaySound("meow");
 
             if (!achievements["trick_master"])
             {
                 achievements["trick_master"] = true;
-                ShowAchievementUnlocked("Numara Ustasý", "Ýlk numaraný yaptýn! ??");
+                ShowAchievementUnlocked("Numara UstasÄ±", "Ä°lk numaranÄ± yaptÄ±n!");
             }
 
             System.Threading.Tasks.Task.Delay(2000).ContinueWith(t =>
@@ -1761,21 +1782,36 @@ namespace PetSimulator
         private void SetupTrayIcon()
         {
             trayMenu = new ContextMenuStrip();
-            trayMenu.Items.Add($"?? {petName}", null, null).Enabled = false;
+            trayMenu.Items.Add($">> {petName}", null, null).Enabled = false;
             trayMenu.Items.Add("-");
-            trayMenu.Items.Add("?? Yem Ver", null, FeedPet);
-            trayMenu.Items.Add("?? Oyna", null, PlayWithPet);
-            trayMenu.Items.Add("?? Uyu", null, SleepPet);
+            trayMenu.Items.Add("Yem Ver", null, FeedPet);
+            trayMenu.Items.Add("Oyna", null, PlayWithPet);
+            trayMenu.Items.Add("Uyu", null, SleepPet);
             trayMenu.Items.Add("-");
-            trayMenu.Items.Add($"Açlýk: {hunger}%", null, null);
+            trayMenu.Items.Add($"AÃ§lÄ±k: {hunger}%", null, null);
             trayMenu.Items.Add($"Mutluluk: {happiness}%", null, null);
             trayMenu.Items.Add($"Enerji: {energy}%", null, null);
-            trayMenu.Items.Add($"Yaþ: {GetAgeString()}", null, null);
+            trayMenu.Items.Add($"YaÅŸ: {GetAgeString()}", null, null);
             trayMenu.Items.Add("-");
-            trayMenu.Items.Add("?? Ýsim Deðiþtir", null, (s, ev) => { AskPetName(); });
-            trayMenu.Items.Add("?? Ýstatistikler", null, (s, ev) => ShowStatsMessage());
-            trayMenu.Items.Add("?? Baþarýmlar (H)", null, (s, ev) => ShowAchievements());
-            trayMenu.Items.Add("? Çýkýþ", null, ExitApp);
+
+            // YENÄ°: Ses aÃ§ma/kapama menÃ¼sÃ¼
+            soundMenuItem = new ToolStripMenuItem(soundEnabled ? "ðŸ”Š Sesler: AÃ§Ä±k" : "ðŸ”‡ Sesler: KapalÄ±");
+            soundMenuItem.Click += (s, ev) =>
+            {
+                soundEnabled = !soundEnabled;
+                soundMenuItem.Text = soundEnabled ? "ðŸ”Š Sesler: AÃ§Ä±k" : "ðŸ”‡ Sesler: KapalÄ±";
+                SavePetData();
+                trayIcon.ShowBalloonTip(1000, "Ses AyarÄ±",
+                    soundEnabled ? "Sesler aÃ§Ä±ldÄ±!" : "Sesler kapatÄ±ldÄ±!",
+                    ToolTipIcon.Info);
+            };
+            trayMenu.Items.Add(soundMenuItem);
+            trayMenu.Items.Add("-");
+
+            trayMenu.Items.Add("Ä°sim DeÄŸiÅŸtir", null, (s, ev) => { AskPetName(); });
+            trayMenu.Items.Add("Ä°statistikler", null, (s, ev) => ShowStatsMessage());
+            trayMenu.Items.Add("BaÅŸarÄ±mlar (H)", null, (s, ev) => ShowAchievements());
+            trayMenu.Items.Add("Ã‡Ä±kÄ±ÅŸ", null, ExitApp);
 
             trayIcon = new NotifyIcon();
             trayIcon.Icon = SystemIcons.Application;
@@ -1788,7 +1824,7 @@ namespace PetSimulator
         private void ExitApp(object sender, EventArgs e)
         {
             DialogResult result = MessageBox.Show(
-                $"{petName}'den ayrýlmak istediðinize emin misiniz? ??",
+                $"{petName}'den ayrÄ±lmak istediÄŸinize emin misiniz?",
                 "Pet Simulator",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Question);
@@ -1808,8 +1844,8 @@ namespace PetSimulator
             {
                 e.Cancel = true;
                 this.Hide();
-                trayIcon.ShowBalloonTip(2000, $"{petName} hala burada! ??",
-                    "Pet'iniz sistem tepsisinde çalýþmaya devam ediyor.",
+                trayIcon.ShowBalloonTip(2000, $"{petName} hala burada!",
+                    "Pet'iniz sistem tepsisinde Ã§alÄ±ÅŸmaya devam ediyor.",
                     ToolTipIcon.Info);
             }
             else
